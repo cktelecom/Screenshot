@@ -1,0 +1,10 @@
+*.iml
+.gradle
+/.idea
+/local.properties
+/build
+.DS_Store
+/captures
+.externalNativeBuild
+proguard-rules.pro
+gradle.properties
