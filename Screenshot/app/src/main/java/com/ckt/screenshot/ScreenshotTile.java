@@ -7,9 +7,9 @@ import android.util.Log;
 
 
 @RequiresApi(api = Build.VERSION_CODES.N)
-public class QuickSettingService extends TileService {
+public class ScreenshotTile extends TileService {
 
-    private static final String TAG = "QuickSettingService";
+    private static final String TAG = "ScreenshotTile";
 
     @Override
     public void onTileAdded() {

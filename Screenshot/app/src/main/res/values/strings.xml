@@ -1,4 +1,9 @@
 <resources>
-    <string name="app_name">ScreenShot</string>
-    <string name="tile_name">ScreenShot</string>
+    <string name="app_name">Screenshot</string>
+    <string name="tile_name">Screenshot</string>
+    <string name="share">Share</string>
+    <string name="cancel">Cancel</string>
+    <string name="save">Save</string>
+    <string name="paint">Paint</string>
+    <string name="long_screenshot">Long Screen Shot</string>
 </resources>
