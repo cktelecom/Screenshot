@@ -1,5 +1,6 @@
 package com.ckt.screenshot;
 
+import android.content.Intent;
 import android.os.Build;
 import android.service.quicksettings.TileService;
 import android.support.annotation.RequiresApi;
@@ -25,6 +26,9 @@ public class ScreenshotTile extends TileService {
     @Override
     public void onClick() {
         Log.d(TAG, "onClick: QS Tile clicked.");
+        Intent intent = new Intent(this,ScreenshotActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivityAndCollapse(intent);
         getQsTile().updateTile();
     }
 }
