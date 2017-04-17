@@ -11,12 +11,18 @@ import android.widget.ScrollView;
 
 public class Screenshot {
     private static String TAG = "Screenshot";
+
     /**
      * 普通截屏
      * **/
-    public static Bitmap takeScreen(View v) {
-        View view = v.getRootView();
-        view.setDrawingCacheEnabled(true);
+    public static Bitmap takeScreen(int width, int height, View view) {
+        // validate view.width and view.height
+        view.layout(0, 0, width, height);
+        int measuredWidth = View.MeasureSpec.makeMeasureSpec(width, View.MeasureSpec.EXACTLY);
+        int measuredHeight = View.MeasureSpec.makeMeasureSpec(height, View.MeasureSpec.EXACTLY);
+        // validate view.measurewidth and view.measureheight
+        view.measure(measuredWidth, measuredHeight);
+        view.layout(0, 0, view.getMeasuredWidth(), view.getMeasuredHeight());
         view.buildDrawingCache();
         Bitmap bitmap = view.getDrawingCache();
 
