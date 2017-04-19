@@ -50,7 +50,7 @@ public class Utils {
             Log.d(TAG, "saveScreenshotFile: success");
         } catch (Throwable e) {
             // Several error may come out with file handling or OOM'
-            Log.e(TAG, "saveScreenshotFile: can't sav screenshot, missing storage permissions");
+            Log.e(TAG, "saveScreenshotFile: failed");
             e.printStackTrace();
         }
     }
