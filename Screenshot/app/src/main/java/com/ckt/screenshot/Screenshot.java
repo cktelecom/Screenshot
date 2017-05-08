@@ -67,6 +67,7 @@ public class Screenshot {
             // 关闭流操作
             dataOutputStream.close();
             outputStream.close();
+            p.waitFor();
         } catch (Throwable t) {
             t.printStackTrace();
         }
