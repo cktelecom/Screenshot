@@ -78,7 +78,7 @@ public class ScreenshotActivity extends AppCompatActivity {
         getWindowManager().getDefaultDisplay().getMetrics(dm);
         int width = dm.widthPixels;
         int height = dm.heightPixels;
-        mBitmap = Screenshot.takeScreen(width, height, getWindow().getDecorView());
+        mBitmap = Screenshot.takeScreen(Utils.getImageFilePath());
     }
 
     /**
