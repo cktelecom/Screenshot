@@ -15,9 +15,9 @@ import java.io.File;
 
 public class ScreenshotActivity extends AppCompatActivity {
     private static final String TAG = "ScreenshotActivity";
+    private static String mScreenshotPath;
     private ImageView mImgScreenshot;
     private Bitmap mBitmap;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,18 +45,17 @@ public class ScreenshotActivity extends AppCompatActivity {
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_share) {
-            saveScreenshot();
-            share();
+            shareScreenshot();
             finish();
             return true;
         }
         if (id == R.id.action_cancel) {
             Log.d(TAG, "cancel screenshot");
+            deleteScreenshot();
             finish();
             return true;
         }
         if (id == R.id.action_done) {
-            saveScreenshot();
             finish();
             return true;
         }
@@ -72,13 +71,11 @@ public class ScreenshotActivity extends AppCompatActivity {
     public void takeScreenshot() {
         Log.d(TAG, "takeScreenshot: ");
 
-        Utils.setFilePathAndName();
+        mScreenshotPath = Utils.getScreenshotPath();
 
-        DisplayMetrics dm = new DisplayMetrics();
-        getWindowManager().getDefaultDisplay().getMetrics(dm);
-        int width = dm.widthPixels;
-        int height = dm.heightPixels;
-        mBitmap = Screenshot.takeScreen(Utils.getImageFilePath());
+        mBitmap = Screenshot.takeScreen(mScreenshotPath);
+        sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE,
+                Uri.fromFile(new File(mScreenshotPath))));
     }
 
     /**
@@ -90,15 +87,29 @@ public class ScreenshotActivity extends AppCompatActivity {
     }
 
     /**
-     * share screenshot to other apps
+     * shareScreenshot screenshot to other apps
      */
-    public void share() {
-        Log.d(TAG, "share pics");
-        final File imageFile = new File(Utils.getImageFilePath());
-        // Create a share intent
+    public void shareScreenshot() {
+        Log.d(TAG, "shareScreenshot pics");
+        final File imageFile = new File(mScreenshotPath);
+        // Create a shareScreenshot intent
         Intent sharingIntent = new Intent(Intent.ACTION_SEND);
         sharingIntent.setType("image/png");
         sharingIntent.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(imageFile));
         startActivity(Intent.createChooser(sharingIntent, getResources().getText(R.string.share)));
+    }
+
+    public void deleteScreenshot() {
+        String msg;
+        boolean deleted = new File(mScreenshotPath).delete();
+        if (deleted) {
+            msg = getString(R.string.action_delete_success);
+        }
+        else {
+            msg = getString(R.string.action_delete_failed);
+        }
+        Log.d(TAG, "deleteScreenshot: " + msg);
+        sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE,
+                Uri.fromFile(new File(mScreenshotPath))));
     }
 }

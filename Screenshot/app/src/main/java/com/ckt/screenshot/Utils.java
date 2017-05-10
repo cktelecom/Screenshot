@@ -14,36 +14,29 @@ public class Utils {
     private static final String TAG = "ScreenshotUtils";
     private static final String SCREENSHOT_FILE_NAME_TEMPLATE = "Screenshot_%s.png";
     private static final String mScreenshotDir = "/storage/emulated/0/Pictures/Screenshots/";
-    private static String mImageFilePath;
+    private static String mScreenshotPath;
 
     /**
      * file name would be like "Screenshot_20170417_222222.png"
      */
-    public static void setFilePathAndName() {
+    public static String getScreenshotPath() {
         long imageTime = System.currentTimeMillis();
         String imageDate = new SimpleDateFormat("yyyyMMdd-HHmmss").format(new Date(imageTime));
         String imageFileName = String.format(SCREENSHOT_FILE_NAME_TEMPLATE, imageDate);
-        mImageFilePath = new File(mScreenshotDir, imageFileName).getAbsolutePath();
-        mImageFilePath = mScreenshotDir + imageFileName;
-        Log.d(TAG, "setFilePathAndName: file name: " + mImageFilePath);
+        mScreenshotPath = new File(mScreenshotDir, imageFileName).getAbsolutePath();
+        Log.d(TAG, "getScreenshotPath: file name: " + mScreenshotPath);
+        return mScreenshotPath;
     }
-
-    /**
-     * @return screenshot image file's absolute path and name
-     */
-    public static String getImageFilePath() {
-        return mImageFilePath;
-    }
-
 
     /**
      * save screenshot to sdcard
+     *
      * @param bitmap the image source to be save
      */
     public static void saveScreenshotFile(Bitmap bitmap) {
         try {
             // Save
-            OutputStream out = new FileOutputStream(getImageFilePath());
+            OutputStream out = new FileOutputStream(mScreenshotPath);
             bitmap.compress(Bitmap.CompressFormat.PNG, 100, out);
             out.flush();
             out.close();
