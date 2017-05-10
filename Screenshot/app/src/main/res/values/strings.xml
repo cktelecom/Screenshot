@@ -6,4 +6,10 @@
     <string name="save">Save</string>
     <string name="paint">Paint</string>
     <string name="long_screenshot">Long Screenshot</string>
+    <string name="action_delete_success">Delete success</string>
+    <string name="action_delete_failed">Delete failed</string>
+    <string name="pen">Pen</string>
+    <string name="color">Brush Color</string>
+    <string name="brush_size">Brush size</string>
+    <string name="undo">Undo</string>
 </resources>
