@@ -6,7 +6,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.PixelFormat;
 import android.graphics.Point;
@@ -23,7 +22,6 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ImageButton;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
@@ -34,6 +32,8 @@ import java.io.OutputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import static android.graphics.Bitmap.CompressFormat.PNG;
+
 public class ScreenshotEditorService extends Service implements View.OnClickListener {
 
     private static String TAG = "ScreenshotEditorService";
@@ -41,12 +41,12 @@ public class ScreenshotEditorService extends Service implements View.OnClickList
     private View mainLayout;
     private WindowManager wm;
     private boolean isShowing = false;
-    private ImageView mImgScreenshot;
+    private DrawingView mImgScreenshot;
     private Bitmap mBitmap;
     private Handler mainHandler;
     private static String mScreenshotPath;
     private static final String SCREENSHOT_FILE_NAME_TEMPLATE = "Screenshot_%s.png";
-    private static final String mScreenshotDir = "/storage/emulated/0/ScreenCapture/Screenshots";
+    private static final String SCREENSHOT_DIR = "/storage/emulated/0/ScreenCapture/Screenshots";
     private static int COLOR_PANEL = 0;
     private static int BRUSH = 0;
     private ImageButton mColorPanel;
@@ -80,7 +80,7 @@ public class ScreenshotEditorService extends Service implements View.OnClickList
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.d(TAG, "onStartCommand: ");
-        mainHandler.post(new Runnable() {
+        mainHandler.postDelayed(new Runnable() {
             @Override
             public void run() {
                 //takeScreenshot();
@@ -88,7 +88,7 @@ public class ScreenshotEditorService extends Service implements View.OnClickList
                 addView();
                 loadScreenshot();
             }
-        });
+        }, 0);
         //这个有必要吗？
         mainLayout.setVisibility(View.VISIBLE);
         return Service.START_STICKY;
@@ -136,7 +136,7 @@ public class ScreenshotEditorService extends Service implements View.OnClickList
                 mainLayout.setSystemUiVisibility(getUiOptions());
             }
         });
-        mImgScreenshot = (ImageView) mainLayout.findViewById(R.id.img_screenshot);
+        mImgScreenshot = (DrawingView) mainLayout.findViewById(R.id.img_screenshot);
         mBrush = (ImageButton) mainLayout.findViewById(R.id.brush);
         mColorPanel = (ImageButton) mainLayout.findViewById(R.id.color_panel);
         mUndo = (ImageButton) mainLayout.findViewById(R.id.undo);
@@ -166,40 +166,56 @@ public class ScreenshotEditorService extends Service implements View.OnClickList
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.btn_share:
+                saveScreenshot();
                 shareScreenshot();
                 removeView();
                 break;
             case R.id.btn_cancel:
-                deleteScreenshot();
+//                deleteScreenshot();
                 removeView();
                 break;
             case R.id.btn_save:
+                saveScreenshot();
                 removeView();
                 onDestroy();
                 break;
             case R.id.paint:
-                mainLayout.findViewById(R.id.bot_bar).setVisibility(View.GONE);
-                mainLayout.findViewById(R.id.paint_bar).setVisibility(View.VISIBLE);
+                changeToPaintMode();
                 break;
             case R.id.brush:
-                mBrush.setImageResource(COLOR_PANEL == 0 ? R.drawable.ic_pen : R.drawable.ic_brush);
-                COLOR_PANEL = 1 - COLOR_PANEL;
-                break;
-            case R.id.color_panel:
-                mColorPanel.setImageResource(BRUSH == 0 ? R.drawable.ic_color_blue : R.drawable.ic_color_red);
+                mBrush.setImageResource(BRUSH == 0 ? R.drawable.ic_brush : R.drawable.ic_pen);
+                mImgScreenshot.setPenSize(BRUSH == 0 ? 40 : 10);
                 BRUSH = 1 - BRUSH;
                 break;
+            case R.id.color_panel:
+                mColorPanel.setImageResource(COLOR_PANEL == 0 ? R.drawable.ic_color_blue : R.drawable.ic_color_red);
+                mImgScreenshot.changePenColor(COLOR_PANEL == 0 ? getColor(R.color.blue) : getColor(R.color.red));
+                COLOR_PANEL = 1 - COLOR_PANEL;
+                break;
+            case R.id.undo:
+                mImgScreenshot.initializeEraser();
             default:
+                break;
         }
     }
 
+    private void changeToPaintMode() {
+        mainLayout.findViewById(R.id.bot_bar).setVisibility(View.GONE);
+        mainLayout.findViewById(R.id.paint_bar).setVisibility(View.VISIBLE);
+        mImgScreenshot.setPenSize(10);
+        mImgScreenshot.setPenColor(Color.RED);
+    }
+
+    /**
+     * need root access
+     */
     public void takeScreenshot() {
         Log.d(TAG, "takeScreenshot: ");
 
         long imageTime = System.currentTimeMillis();
         String imageDate = new SimpleDateFormat("yyyyMMdd-HHmmss").format(new Date(imageTime));
         String imageFileName = String.format(SCREENSHOT_FILE_NAME_TEMPLATE, imageDate);
-        mScreenshotPath = new File(mScreenshotDir, imageFileName).getAbsolutePath();
+        mScreenshotPath = new File(SCREENSHOT_DIR, imageFileName).getAbsolutePath();
         Log.d(TAG, "getScreenshotPath: file name: " + mScreenshotPath);
 
         String cmd = "screencap -p " + mScreenshotPath;
@@ -237,8 +253,8 @@ public class ScreenshotEditorService extends Service implements View.OnClickList
 
         Log.d(TAG, "loadScreenshot: exists");
         Bitmap bitmap = ScreenshotActivity.getBitmap();
-        mImgScreenshot.setImageBitmap(bitmap);
-
+//        mImgScreenshot.setImageBitmap(bitmap);
+        mImgScreenshot.loadImage(bitmap);
 //        mImgScreenshot.setImageResource(R.drawable.sc_example);
     }
 
@@ -247,13 +263,16 @@ public class ScreenshotEditorService extends Service implements View.OnClickList
      */
     public void saveScreenshot() {
         Log.d(TAG, "saveScreenshot to storage");
+        mScreenshotPath = FileUtil.getScreenshotDirAndName();
         //        如何解决耗时问题
         try {
             // Save
             OutputStream out = new FileOutputStream(mScreenshotPath);
-            mBitmap.compress(Bitmap.CompressFormat.PNG, 100, out);
+            mImgScreenshot.getBitmap().compress(PNG, 100, out);
             out.flush();
             out.close();
+            sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE,
+                    Uri.fromFile(new File(mScreenshotPath))));
             Log.d(TAG, "saveScreenshotFile: success");
         } catch (Throwable e) {
             // Several error may come out with file handling or OOM'
@@ -264,6 +283,7 @@ public class ScreenshotEditorService extends Service implements View.OnClickList
 
     public void shareScreenshot() {
         Log.d(TAG, "shareScreenshot pics");
+        mScreenshotPath = FileUtil.getScreenshotDirAndName();
         final File imageFile = new File(mScreenshotPath);
         // Create a shareScreenshot intent
         Intent sharingIntent = new Intent(Intent.ACTION_SEND);

@@ -52,10 +52,12 @@
         android:layout_height="0dp"
         android:layout_weight="1">
 
-        <ImageView
+        <com.ckt.screenshot.DrawingView
             android:id="@+id/img_screenshot"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:background="@color/translucent" />
+
     </FrameLayout>
 
     <LinearLayout
@@ -98,7 +100,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:src="@drawable/ic_brush"
+            android:src="@drawable/ic_pen"
             android:text="@string/brush_size" />
 
         <ImageButton

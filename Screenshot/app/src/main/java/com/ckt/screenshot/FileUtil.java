@@ -13,6 +13,7 @@ public class FileUtil {
             + "Screenshots" + File.separator;
 
     public static final String SCREENSHOT_NAME = "Screenshot";
+    public static String screenshotDirAndName;
 
     public static String getAppPath(Context context) {
         if (Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState())) {
@@ -47,8 +48,11 @@ public class FileUtil {
         stringBuffer.append("_");
         stringBuffer.append(date);
         stringBuffer.append(".png");
-
-        return stringBuffer.toString();
+        screenshotDirAndName = stringBuffer.toString();
+        return screenshotDirAndName;
     }
 
+    public static String getScreenshotDirAndName() {
+        return screenshotDirAndName;
+    }
 }

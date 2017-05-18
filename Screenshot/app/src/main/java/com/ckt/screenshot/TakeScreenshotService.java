@@ -5,7 +5,6 @@ import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.PixelFormat;
 import android.hardware.display.DisplayManager;
 import android.hardware.display.VirtualDisplay;
@@ -20,12 +19,8 @@ import android.os.IBinder;
 import android.support.v4.os.AsyncTaskCompat;
 import android.util.DisplayMetrics;
 import android.util.Log;
-import android.view.GestureDetector;
 import android.view.Gravity;
-import android.view.MotionEvent;
-import android.view.View;
 import android.view.WindowManager;
-import android.widget.ImageView;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -34,6 +29,8 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 
 public class TakeScreenshotService extends Service {
+    private static final String TAG = "TakeScreenshotService";
+
     private MediaProjection mMediaProjection;
     private VirtualDisplay mVirtualDisplay;
 
@@ -232,7 +229,7 @@ public class TakeScreenshotService extends Service {
 
             if (bitmap != null) {
                 ScreenshotActivity.setBitmap(bitmap);
-                Log.e("sida", "获取图片成功");
+                Log.d(TAG, "获取图片成功");
                 Intent intent = new Intent(getApplicationContext(), ScreenshotEditorService.class);
                 startService(intent);
             }

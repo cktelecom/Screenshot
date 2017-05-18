@@ -5,4 +5,6 @@
     <color name="colorAccent">#FF4081</color>
     <color name="lightBlack">#333333</color>
     <color name="translucent">#77000000</color>
+    <color name="red">#ffff1744</color>
+    <color name="blue">#ff2962FF</color>
 </resources>
