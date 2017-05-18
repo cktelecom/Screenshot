@@ -26,9 +26,12 @@ public class ScreenshotTile extends TileService {
     @Override
     public void onClick() {
         Log.d(TAG, "onClick: QS Tile clicked.");
-        Intent intent = new Intent(this,ScreenshotActivity.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+
+        Intent intent = new Intent();
+        intent.setClass(this, TransitActivity.class);
         startActivityAndCollapse(intent);
+
         getQsTile().updateTile();
     }
+
 }

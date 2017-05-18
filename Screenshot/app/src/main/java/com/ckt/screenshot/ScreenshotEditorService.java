@@ -46,7 +46,7 @@ public class ScreenshotEditorService extends Service implements View.OnClickList
     private Handler mainHandler;
     private static String mScreenshotPath;
     private static final String SCREENSHOT_FILE_NAME_TEMPLATE = "Screenshot_%s.png";
-    private static final String mScreenshotDir = "/storage/emulated/0/Pictures/Screenshots/";
+    private static final String mScreenshotDir = "/storage/emulated/0/ScreenCapture/Screenshots";
     private static int COLOR_PANEL = 0;
     private static int BRUSH = 0;
     private ImageButton mColorPanel;
@@ -80,15 +80,15 @@ public class ScreenshotEditorService extends Service implements View.OnClickList
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.d(TAG, "onStartCommand: ");
-        mainHandler.postDelayed(new Runnable() {
+        mainHandler.post(new Runnable() {
             @Override
             public void run() {
-                takeScreenshot();
+                //takeScreenshot();
 //                saveScreenshot();
                 addView();
                 loadScreenshot();
             }
-        }, 700);
+        });
         //这个有必要吗？
         mainLayout.setVisibility(View.VISIBLE);
         return Service.START_STICKY;
@@ -234,14 +234,11 @@ public class ScreenshotEditorService extends Service implements View.OnClickList
     }
 
     public void loadScreenshot() {
-        Log.d(TAG, "loadScreenshot: mScreenshotPath: " + mScreenshotPath);
 
-        final File file = new File(mScreenshotPath);
-        if (file.exists()) {
-            Log.d(TAG, "loadScreenshot: exists");
-            Bitmap bitmap = BitmapFactory.decodeFile(mScreenshotPath);
-            mImgScreenshot.setImageBitmap(bitmap);
-        }
+        Log.d(TAG, "loadScreenshot: exists");
+        Bitmap bitmap = ScreenshotActivity.getBitmap();
+        mImgScreenshot.setImageBitmap(bitmap);
+
 //        mImgScreenshot.setImageResource(R.drawable.sc_example);
     }
 

@@ -34,6 +34,10 @@
             android:theme="@style/ScreenshotEditorStyle">
         </service>
 
+        <service android:name=".TakeScreenshotService"
+            android:exported="false">
+        </service>
+
         <activity android:name=".TransitActivity">
             <intent-filter>
                 <action android:name="android.service.quicksettings.action.QS_TILE_PREFERENCES" />

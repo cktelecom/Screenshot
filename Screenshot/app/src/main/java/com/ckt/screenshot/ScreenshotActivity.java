@@ -1,11 +1,16 @@
 package com.ckt.screenshot;
 
+import android.Manifest;
+import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.media.projection.MediaProjectionManager;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -17,16 +22,25 @@ public class ScreenshotActivity extends AppCompatActivity {
     private static final String TAG = "ScreenshotActivity";
     private static String mScreenshotPath;
     private ImageView mImgScreenshot;
-    private Bitmap mBitmap;
+    private static Bitmap mBitmap;
+
+    public static final int REQUEST_MEDIA_PROJECTION = 18;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        takeScreenshot();
+        requestPermission();
+        requestCapturePermission();
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.crop_view);
+        /*setContentView(R.layout.crop_view);
         mImgScreenshot = (ImageView) findViewById(R.id.img_screenshot);
 
-        loadScreenshot();
+        loadScreenshot();*/
+    }
+
+    private void requestPermission() {
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
+        }
     }
 
     @Override
@@ -51,7 +65,6 @@ public class ScreenshotActivity extends AppCompatActivity {
         }
         if (id == R.id.action_cancel) {
             Log.d(TAG, "cancel screenshot");
-            deleteScreenshot();
             finish();
             return true;
         }
@@ -73,9 +86,9 @@ public class ScreenshotActivity extends AppCompatActivity {
 
         mScreenshotPath = Utils.getScreenshotPath();
 
-        mBitmap = Screenshot.takeScreen(mScreenshotPath);
+        /*mBitmap = Screenshot.takeScreen(mScreenshotPath);
         sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE,
-                Uri.fromFile(new File(mScreenshotPath))));
+                Uri.fromFile(new File(mScreenshotPath))));*/
     }
 
     /**
@@ -112,4 +125,38 @@ public class ScreenshotActivity extends AppCompatActivity {
         sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE,
                 Uri.fromFile(new File(mScreenshotPath))));
     }
+
+    public void requestCapturePermission() {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
+            return;
+        }
+
+        MediaProjectionManager mediaProjectionManager = (MediaProjectionManager)
+                getSystemService(Context.MEDIA_PROJECTION_SERVICE);
+        startActivityForResult(
+                mediaProjectionManager.createScreenCaptureIntent(),
+                REQUEST_MEDIA_PROJECTION);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        switch (requestCode) {
+            case REQUEST_MEDIA_PROJECTION:
+                if (resultCode == RESULT_OK && data != null) {
+                    TakeScreenshotService.setResultData(data);
+                }
+                break;
+        }
+    }
+
+    public static void setBitmap(Bitmap bitmap) {
+        mBitmap = bitmap;
+    }
+
+    public static Bitmap getBitmap() {
+        return mBitmap;
+    }
+
 }

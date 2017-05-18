@@ -13,8 +13,11 @@ public class TransitActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Log.d(TAG, "onCreate: finish this activity immediately");
-        Intent startIntent = new Intent(this, ScreenshotEditorService.class);
-        startService(startIntent);
+
+        startService(new Intent(getApplicationContext(), TakeScreenshotService.class));
+
+        /*Intent startIntent = new Intent(this, ScreenshotEditorService.class);
+        startService(startIntent);*/
         finish();
     }
 }
