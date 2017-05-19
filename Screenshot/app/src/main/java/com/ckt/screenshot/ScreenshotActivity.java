@@ -28,8 +28,6 @@ public class ScreenshotActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        requestPermission();
-        requestCapturePermission();
         super.onCreate(savedInstanceState);
         /*setContentView(R.layout.crop_view);
         mImgScreenshot = (ImageView) findViewById(R.id.img_screenshot);

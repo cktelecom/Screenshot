@@ -60,7 +60,7 @@ public class TakeScreenshotService extends Service {
             public void run() {
                 startScreenShot();
             }
-        }, 430);
+        }, 500);
         return Service.START_STICKY;
     }
 
@@ -232,6 +232,7 @@ public class TakeScreenshotService extends Service {
                 Log.d(TAG, "获取图片成功");
                 Intent intent = new Intent(getApplicationContext(), ScreenshotEditorService.class);
                 startService(intent);
+                stopSelf();
             }
 
         }

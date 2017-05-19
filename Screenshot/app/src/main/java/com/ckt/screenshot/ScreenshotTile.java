@@ -15,7 +15,9 @@ public class ScreenshotTile extends TileService {
     @Override
     public void onTileAdded() {
         Log.d(TAG, "onTileAdded");
-        getQsTile().updateTile();
+        if (getQsTile() != null) {
+            getQsTile().updateTile();
+        }
     }
 
     @Override
