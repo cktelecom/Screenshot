@@ -34,6 +34,8 @@ public class DrawingView extends View {
     private float mX, mY;
     private float mPenSize = 0;
     private float mEraserSize = 10;
+    private float mProportion = 0;
+    private float mTranslationalW = 0;
 
     public DrawingView(Context c) {
         this(c, null);
@@ -81,8 +83,16 @@ public class DrawingView extends View {
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
-        canvas.drawBitmap(mBitmap, 0, 0, mBitmapPaint);
-        canvas.drawPath(mPath, mPaint);
+        Matrix matrix = new Matrix();
+        float proportion = (float) canvas.getHeight() / mBitmap.getHeight();
+        if (proportion != 1) {
+            mProportion = proportion;
+            mTranslationalW = (canvas.getWidth() - mBitmap.getWidth() * proportion) / 2;
+        }
+        matrix.postScale(proportion, proportion);
+        matrix.postTranslate((canvas.getWidth() - mBitmap.getWidth() * proportion) / 2, 0);
+        canvas.drawBitmap(mBitmap, matrix, mBitmapPaint);
+
     }
 
     private void touch_start(float x, float y) {
@@ -117,8 +127,15 @@ public class DrawingView extends View {
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        float x = event.getX();
-        float y = event.getY();
+        float x;
+        float y;
+        if (mProportion != 0 && mTranslationalW != 0) {
+            x = (event.getX() - mTranslationalW) / mProportion;
+            y = event.getY() / mProportion;
+        } else {
+            x = event.getX();
+            y = event.getY();
+        }
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
                 if (mDrawMode) {
