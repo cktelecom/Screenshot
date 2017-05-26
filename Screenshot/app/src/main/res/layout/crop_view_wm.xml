@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical">
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:orientation="vertical">
 
     <LinearLayout
         android:id="@+id/top_bar"
@@ -20,7 +20,7 @@
             android:gravity="center|start"
             android:paddingStart="@dimen/activity_horizontal_margin"
             android:text="@string/tile_name"
-            android:textAppearance="@style/TextAppearance.AppCompat.Title.Inverse" />
+            android:textAppearance="@style/TextAppearance.AppCompat.Title.Inverse"/>
 
         <ImageButton
             android:id="@+id/btn_share"
@@ -28,7 +28,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:src="@drawable/ic_menu_share" />
+            android:src="@drawable/ic_menu_share"/>
 
         <ImageButton
             android:id="@+id/btn_cancel"
@@ -36,7 +36,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:src="@drawable/ic_menu_cancel" />
+            android:src="@drawable/ic_menu_cancel"/>
 
         <ImageButton
             android:id="@+id/btn_save"
@@ -44,7 +44,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:src="@drawable/ic_menu_done" />
+            android:src="@drawable/ic_menu_done"/>
     </LinearLayout>
 
     <FrameLayout
@@ -56,7 +56,13 @@
             android:id="@+id/img_screenshot"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="@color/translucent" />
+            android:background="@color/translucent"/>
+
+        <com.ckt.screenshot.CropImageView
+            android:id="@+id/crop_imageview"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="gone"/>
 
     </FrameLayout>
 
@@ -74,7 +80,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="@string/paint" />
+            android:text="@string/paint"/>
 
         <Button
             android:id="@+id/long_screenshot"
@@ -82,8 +88,29 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="@string/long_screenshot" />
+            android:text="@string/long_screenshot"/>
 
+        <Button
+            android:id="@+id/button_cut"
+            style="@style/ButtonStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/crop_cut"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/mlinearlayout_sure"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="gone">
+
+        <Button
+            android:id="@+id/button_sure"
+            style="@style/ButtonStyle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/save"/>
     </LinearLayout>
 
     <LinearLayout
@@ -101,7 +128,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:src="@drawable/ic_pen"
-            android:text="@string/brush_size" />
+            android:text="@string/brush_size"/>
 
         <ImageButton
             android:id="@+id/color_panel"
@@ -110,7 +137,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:src="@drawable/ic_color_red"
-            android:text="@string/color" />
+            android:text="@string/color"/>
 
 
         <ImageButton
@@ -120,7 +147,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:src="@drawable/ic_undo"
-            android:text="@string/undo" />
+            android:text="@string/undo"/>
 
     </LinearLayout>
 

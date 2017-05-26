@@ -27,6 +27,7 @@ public class DrawingView extends View {
     private float mEraserSize = 10;
     private float mProportion = 0;
     private float mTranslationalW = 0;
+    private float mTranslationalH = 0;
 
     public DrawingView(Context c) {
         this(c, null);
@@ -76,13 +77,19 @@ public class DrawingView extends View {
         super.onDraw(canvas);
         Matrix matrix = new Matrix();
         float proportion = (float) canvas.getHeight() / mBitmap.getHeight();
-        if (proportion != 1) {
+        if (proportion < 1) {
             mProportion = proportion;
             mTranslationalW = (canvas.getWidth() - mBitmap.getWidth() * proportion) / 2;
+            matrix.postScale(proportion, proportion);
+            matrix.postTranslate((canvas.getWidth() - mBitmap.getWidth() * proportion) / 2, 0);
+            canvas.drawBitmap(mBitmap, matrix, mBitmapPaint);
+        } else {
+            mTranslationalW = (canvas.getWidth() - mBitmap.getWidth()) / 2;
+            mTranslationalH = (canvas.getHeight() - mBitmap.getHeight()) / 2;
+            mProportion = 0;
+            canvas.drawBitmap(mBitmap, (canvas.getWidth() - mBitmap.getWidth()) / 2,
+                    (canvas.getHeight() - mBitmap.getHeight()) / 2, mBitmapPaint);
         }
-        matrix.postScale(proportion, proportion);
-        matrix.postTranslate((canvas.getWidth() - mBitmap.getWidth() * proportion) / 2, 0);
-        canvas.drawBitmap(mBitmap, matrix, mBitmapPaint);
     }
 
     private void touch_start(float x, float y) {
@@ -122,6 +129,9 @@ public class DrawingView extends View {
         if (mProportion != 0 && mTranslationalW != 0) {
             x = (event.getX() - mTranslationalW) / mProportion;
             y = event.getY() / mProportion;
+        } else if (mTranslationalH != 0) {
+            x = event.getX() - mTranslationalW;
+            y = event.getY() - mTranslationalH;
         } else {
             x = event.getX();
             y = event.getY();
@@ -210,6 +220,8 @@ public class DrawingView extends View {
 
     public void setImageBitmap(Bitmap bitmap) {
         mBitmap = bitmap.copy(Bitmap.Config.ARGB_8888, true);
+        mCanvas = new Canvas(mBitmap);
+        mCanvas.drawColor(Color.TRANSPARENT);
         bitmap.recycle();
         invalidate();
     }

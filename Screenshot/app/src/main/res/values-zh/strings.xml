@@ -7,4 +7,5 @@
     <string name="save">保存</string>
     <string name="paint">涂鸦</string>
     <string name="long_screenshot">长截图</string>
+    <string name="crop_cut">裁剪</string>
 </resources>

@@ -8,6 +8,7 @@ import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.PixelFormat;
 import android.graphics.Point;
+import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Handler;
@@ -49,6 +50,10 @@ public class ScreenshotEditorService extends Service implements View.OnClickList
     private ImageButton mColorPanel;
     private ImageButton mBrush;
     private ImageButton mUndo;
+    private CropImageView mCropImageView;
+    private LinearLayout mLinearLayout;
+    private LinearLayout mLinearLayoutsure;
+    private Button mButtonCut;
 
     @Override
     public void onCreate() {
@@ -135,20 +140,26 @@ public class ScreenshotEditorService extends Service implements View.OnClickList
         mBrush = (ImageButton) mainLayout.findViewById(R.id.brush);
         mColorPanel = (ImageButton) mainLayout.findViewById(R.id.color_panel);
         mUndo = (ImageButton) mainLayout.findViewById(R.id.undo);
-
+        mCropImageView = (CropImageView) mainLayout.findViewById(R.id.crop_imageview);
+        mLinearLayout = (LinearLayout) mainLayout.findViewById(R.id.bot_bar);
+        mLinearLayoutsure = (LinearLayout) mainLayout.findViewById(R.id.mlinearlayout_sure);
+        mButtonCut = (Button) mainLayout.findViewById(R.id.button_cut);
         final ImageButton shareButton = (ImageButton) mainLayout.findViewById(R.id.btn_share);
         final ImageButton cancelButton = (ImageButton) mainLayout.findViewById(R.id.btn_cancel);
         final ImageButton saveButton = (ImageButton) mainLayout.findViewById(R.id.btn_save);
         final Button paintBtn = (Button) mainLayout.findViewById(R.id.paint);
         final Button longScreenshotBtn = (Button) mainLayout.findViewById(R.id.long_screenshot);
+        final Button mButtonSure = (Button) mainLayout.findViewById(R.id.button_sure);
         mBrush.setOnClickListener(this);
         mColorPanel.setOnClickListener(this);
         mUndo.setOnClickListener(this);
+        mButtonCut.setOnClickListener(this);
         shareButton.setOnClickListener(this);
         cancelButton.setOnClickListener(this);
         saveButton.setOnClickListener(this);
         paintBtn.setOnClickListener(this);
         longScreenshotBtn.setOnClickListener(this);
+        mButtonSure.setOnClickListener(this);
     }
 
     @Override
@@ -189,9 +200,33 @@ public class ScreenshotEditorService extends Service implements View.OnClickList
                 break;
             case R.id.undo:
                 mImgScreenshot.initializeEraser();
+                break;
+            case R.id.button_cut:
+                cutStart();
+                break;
+            case R.id.button_sure:
+                cutEnd();
+                break;
             default:
                 break;
         }
+    }
+
+    private void cutEnd() {
+        mImgScreenshot.setImageBitmap(mCropImageView.getCropImage());
+        mImgScreenshot.setVisibility(View.VISIBLE);
+        mLinearLayout.setVisibility(View.VISIBLE);
+        mLinearLayoutsure.setVisibility(View.GONE);
+        mCropImageView.setVisibility(View.GONE);
+    }
+
+    private void cutStart() {
+        Bitmap mbitmap = mImgScreenshot.getImageBitmap();
+        mImgScreenshot.setVisibility(View.GONE);
+        mLinearLayout.setVisibility(View.GONE);
+        mLinearLayoutsure.setVisibility(View.VISIBLE);
+        mCropImageView.setDrawable(new BitmapDrawable(mbitmap), 300, 300);
+        mCropImageView.setVisibility(View.VISIBLE);
     }
 
     private void changeToPaintMode() {
@@ -207,7 +242,7 @@ public class ScreenshotEditorService extends Service implements View.OnClickList
     public void takeScreenshot() {
         Log.d(TAG, "takeScreenshot: ");
 
-        mScreenshotPath =  FileUtil.getScreenshotDirAndName();
+        mScreenshotPath = FileUtil.getScreenshotDirAndName();
 
         String cmd = "screencap -p " + mScreenshotPath;
         try {
