@@ -189,38 +189,8 @@ public class TakeScreenshotService extends Service {
             bitmap.copyPixelsFromBuffer(buffer);
             bitmap = Bitmap.createBitmap(bitmap, 0, 0, width, height);
             image.close();
-            File fileImage = null;
-            if (bitmap != null) {
-                try {
-                    fileImage = new File(FileUtil.getScreenShotsName(getApplicationContext()));
-                    if (!fileImage.exists()) {
-                        fileImage.createNewFile();
-                    }
-                    FileOutputStream out = new FileOutputStream(fileImage);
-                    if (out != null) {
-                        bitmap.compress(Bitmap.CompressFormat.PNG, 100, out);
-                        out.flush();
-                        out.close();
-                        Intent media = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
-                        Uri contentUri = Uri.fromFile(fileImage);
-                        media.setData(contentUri);
-                        sendBroadcast(media);
-                    }
-                } catch (FileNotFoundException e) {
-                    e.printStackTrace();
-                    fileImage = null;
-                } catch (IOException e) {
-                    e.printStackTrace();
-                    fileImage = null;
-                }
-            }
-
-            image.close();
-
-            if (fileImage != null) {
-                return bitmap;
-            }
-            return null;
+            FileUtil.getScreenShotsName(getApplicationContext());
+            return bitmap;
         }
 
         @Override
