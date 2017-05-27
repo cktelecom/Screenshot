@@ -82,7 +82,7 @@ public class ScreenshotActivity extends AppCompatActivity {
     public void takeScreenshot() {
         Log.d(TAG, "takeScreenshot: ");
 
-        mScreenshotPath = Utils.getScreenshotPath();
+        mScreenshotPath = FileUtil.getScreenshotDirAndName();
 
         /*mBitmap = Screenshot.takeScreen(mScreenshotPath);
         sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE,
@@ -94,7 +94,7 @@ public class ScreenshotActivity extends AppCompatActivity {
      */
     public void saveScreenshot() {
         Log.d(TAG, "saveScreenshot to storage");
-        Utils.saveScreenshotFile(mBitmap);
+        FileUtil.saveScreenshotFile(mBitmap);
     }
 
     /**

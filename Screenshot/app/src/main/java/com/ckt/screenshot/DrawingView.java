@@ -1,7 +1,6 @@
 package com.ckt.screenshot;
 
 import android.content.Context;
-import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -10,18 +9,10 @@ import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
-import android.net.Uri;
 import android.support.annotation.ColorInt;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
-
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-
-import static android.graphics.Bitmap.CompressFormat.PNG;
 
 public class DrawingView extends View {
     private static final float TOUCH_TOLERANCE = 4;
@@ -92,7 +83,6 @@ public class DrawingView extends View {
         matrix.postScale(proportion, proportion);
         matrix.postTranslate((canvas.getWidth() - mBitmap.getWidth() * proportion) / 2, 0);
         canvas.drawBitmap(mBitmap, matrix, mBitmapPaint);
-
     }
 
     private void touch_start(float x, float y) {
@@ -195,13 +185,13 @@ public class DrawingView extends View {
         initializeEraser();
     }
 
+    public float getEraserSize() {
+        return mEraserSize;
+    }
+
     public void setPenSize(float size) {
         mPenSize = size;
         initializePen();
-    }
-
-    public float getEraserSize() {
-        return mEraserSize;
     }
 
     public float getPenSize() {
@@ -212,92 +202,19 @@ public class DrawingView extends View {
         mPaint.setColor(color);
     }
 
-    public void changePenColor(int color) {
-        mPaint.setColor(color);
-    }
-
     public
     @ColorInt
     int getPenColor() {
         return mPaint.getColor();
     }
 
-    public void loadImage(Bitmap bitmap) {
+    public void setImageBitmap(Bitmap bitmap) {
         mBitmap = bitmap.copy(Bitmap.Config.ARGB_8888, true);
         bitmap.recycle();
         invalidate();
     }
 
-    public void setImageBitmap(Bitmap bitmap) {
-        //suofang
-        Matrix matrix = new Matrix();
-        matrix.postScale(0.8f, 0.8f);
-        mBitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
-        bitmap.recycle();
-        invalidate();
-    }
-
-    public boolean saveImage(String filePath, String filename, Bitmap.CompressFormat format,
-                             int quality) {
-        if (quality > 100) {
-            Log.d("saveImage", "quality cannot be greater that 100");
-            return false;
-        }
-        File file;
-        FileOutputStream out = null;
-        try {
-            switch (format) {
-                case PNG:
-                    file = new File(filePath, filename + ".png");
-                    out = new FileOutputStream(file);
-                    return mBitmap.compress(PNG, quality, out);
-                case JPEG:
-                    file = new File(filePath, filename + ".jpg");
-                    out = new FileOutputStream(file);
-                    return mBitmap.compress(Bitmap.CompressFormat.JPEG, quality, out);
-                default:
-                    file = new File(filePath, filename + ".png");
-                    out = new FileOutputStream(file);
-                    return mBitmap.compress(PNG, quality, out);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            try {
-                if (out != null) {
-                    out.close();
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-        return false;
-    }
-
-    public boolean saveScreenshot(String screenshotPath) {
-        FileOutputStream out = null;
-        try {
-            File file = new File(screenshotPath /*+ ".PNG"*/);
-            out = new FileOutputStream(file);
-            return mBitmap.compress(PNG, 100, out);
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            if (out != null) {
-                try {
-                    out.flush();
-                    out.close();
-                    getContext().sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE,
-                            Uri.fromFile(new File(screenshotPath))));
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-        return false;
-    }
-
-    public Bitmap getBitmap() {
+    public Bitmap getImageBitmap() {
         return mBitmap;
     }
 }

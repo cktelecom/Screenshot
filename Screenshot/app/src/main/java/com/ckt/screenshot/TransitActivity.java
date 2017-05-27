@@ -27,7 +27,7 @@ public class TransitActivity extends Activity {
         requestPermission();
     }
 
-    public void requestDrawOverPermisssion() {
+    public void requestDrawOverPermission() {
         if (Build.VERSION.SDK_INT >= 23) {
             if (!Settings.canDrawOverlays(TransitActivity.this)) {
                 Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
@@ -85,7 +85,7 @@ public class TransitActivity extends Activity {
             ActivityCompat.requestPermissions(this, new String[]
                     {Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
         } else {
-            requestDrawOverPermisssion();
+            requestDrawOverPermission();
         }
     }
 
@@ -94,7 +94,7 @@ public class TransitActivity extends Activity {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
 
         if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-            requestDrawOverPermisssion();
+            requestDrawOverPermission();
         } else {
             finish();
         }

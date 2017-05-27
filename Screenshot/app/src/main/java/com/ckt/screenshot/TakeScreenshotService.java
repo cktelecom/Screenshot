@@ -12,7 +12,6 @@ import android.media.Image;
 import android.media.ImageReader;
 import android.media.projection.MediaProjection;
 import android.media.projection.MediaProjectionManager;
-import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.IBinder;
@@ -22,10 +21,6 @@ import android.util.Log;
 import android.view.Gravity;
 import android.view.WindowManager;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.nio.ByteBuffer;
 
 public class TakeScreenshotService extends Service {
@@ -190,7 +185,7 @@ public class TakeScreenshotService extends Service {
             bitmap.copyPixelsFromBuffer(buffer);
             bitmap = Bitmap.createBitmap(bitmap, 0, 0, width, height);
             image.close();
-            FileUtil.getScreenShotsName(getApplicationContext());
+            FileUtil.generateScreenshotName(getApplicationContext());
             return bitmap;
         }
 
@@ -205,7 +200,6 @@ public class TakeScreenshotService extends Service {
                 startService(intent);
                 stopSelf();
             }
-
         }
     }
 

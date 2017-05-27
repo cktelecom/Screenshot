@@ -6,7 +6,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
-import android.graphics.Color;
 import android.graphics.PixelFormat;
 import android.graphics.Point;
 import android.net.Uri;
@@ -29,8 +28,6 @@ import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 
 import static android.graphics.Bitmap.CompressFormat.PNG;
 
@@ -83,8 +80,6 @@ public class ScreenshotEditorService extends Service implements View.OnClickList
         mainHandler.postDelayed(new Runnable() {
             @Override
             public void run() {
-                //takeScreenshot();
-//                saveScreenshot();
                 addView();
                 loadScreenshot();
             }
@@ -189,7 +184,7 @@ public class ScreenshotEditorService extends Service implements View.OnClickList
                 break;
             case R.id.color_panel:
                 mColorPanel.setImageResource(COLOR_PANEL == 0 ? R.drawable.ic_color_blue : R.drawable.ic_color_red);
-                mImgScreenshot.changePenColor(COLOR_PANEL == 0 ? getColor(R.color.blue) : getColor(R.color.red));
+                mImgScreenshot.setPenColor(COLOR_PANEL == 0 ? getColor(R.color.blue) : getColor(R.color.red));
                 COLOR_PANEL = 1 - COLOR_PANEL;
                 break;
             case R.id.undo:
@@ -203,7 +198,7 @@ public class ScreenshotEditorService extends Service implements View.OnClickList
         mainLayout.findViewById(R.id.bot_bar).setVisibility(View.GONE);
         mainLayout.findViewById(R.id.paint_bar).setVisibility(View.VISIBLE);
         mImgScreenshot.setPenSize(10);
-        mImgScreenshot.setPenColor(Color.RED);
+        mImgScreenshot.setPenColor(getColor(R.color.red));
     }
 
     /**
@@ -212,11 +207,7 @@ public class ScreenshotEditorService extends Service implements View.OnClickList
     public void takeScreenshot() {
         Log.d(TAG, "takeScreenshot: ");
 
-        long imageTime = System.currentTimeMillis();
-        String imageDate = new SimpleDateFormat("yyyyMMdd-HHmmss").format(new Date(imageTime));
-        String imageFileName = String.format(SCREENSHOT_FILE_NAME_TEMPLATE, imageDate);
-        mScreenshotPath = new File(SCREENSHOT_DIR, imageFileName).getAbsolutePath();
-        Log.d(TAG, "getScreenshotPath: file name: " + mScreenshotPath);
+        mScreenshotPath =  FileUtil.getScreenshotDirAndName();
 
         String cmd = "screencap -p " + mScreenshotPath;
         try {
@@ -238,24 +229,13 @@ public class ScreenshotEditorService extends Service implements View.OnClickList
         } catch (Throwable t) {
             t.printStackTrace();
         }
-
-//        DisplayMetrics dm = new DisplayMetrics();
-//        int width = dm.widthPixels;
-//        int height = dm.heightPixels;
-//        mBitmap = Screenshot.takeScreen(width, height, getWindow().getDecorView());
-
-//        系统截图
-//        mBitmap = SurfaceControl.screenshot(width, height);
-//        mImgScreenshot.setBackgroundResource(R.drawable.);
     }
 
     public void loadScreenshot() {
 
         Log.d(TAG, "loadScreenshot: exists");
         Bitmap bitmap = ScreenshotActivity.getBitmap();
-//        mImgScreenshot.setImageBitmap(bitmap);
-        mImgScreenshot.loadImage(bitmap);
-//        mImgScreenshot.setImageResource(R.drawable.sc_example);
+        mImgScreenshot.setImageBitmap(bitmap);
     }
 
     /**
@@ -264,11 +244,10 @@ public class ScreenshotEditorService extends Service implements View.OnClickList
     public void saveScreenshot() {
         Log.d(TAG, "saveScreenshot to storage");
         mScreenshotPath = FileUtil.getScreenshotDirAndName();
-        //        如何解决耗时问题
         try {
             // Save
             OutputStream out = new FileOutputStream(mScreenshotPath);
-            mImgScreenshot.getBitmap().compress(PNG, 100, out);
+            mImgScreenshot.getImageBitmap().compress(PNG, 100, out);
             out.flush();
             out.close();
             sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE,
@@ -276,7 +255,7 @@ public class ScreenshotEditorService extends Service implements View.OnClickList
             Log.d(TAG, "saveScreenshotFile: success");
         } catch (Throwable e) {
             // Several error may come out with file handling or OOM'
-            Log.e(TAG, "saveScreenshotFile: can't sav screenshot");
+            Log.e(TAG, "saveScreenshotFile: failed");
             e.printStackTrace();
         }
     }
