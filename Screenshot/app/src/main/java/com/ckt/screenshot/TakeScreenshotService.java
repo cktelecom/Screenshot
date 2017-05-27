@@ -81,11 +81,12 @@ public class TakeScreenshotService extends Service {
         mLayoutParams = new WindowManager.LayoutParams();
         mWindowManager = (WindowManager) getSystemService(Context.WINDOW_SERVICE);
 
-        DisplayMetrics metrics = new DisplayMetrics();
-        mWindowManager.getDefaultDisplay().getMetrics(metrics);
-        mScreenDensity = metrics.densityDpi;
-        mScreenWidth = metrics.widthPixels;
-        mScreenHeight = metrics.heightPixels;
+        DisplayMetrics displayMetrics = new DisplayMetrics();
+        mWindowManager.getDefaultDisplay().getRealMetrics(displayMetrics);
+        mScreenDensity = displayMetrics.densityDpi;
+        mScreenWidth = displayMetrics.widthPixels;
+        mScreenHeight = displayMetrics.heightPixels;
+        Log.d(TAG, "mScreenWidth: " + mScreenWidth + "mScreenHeight: " + mScreenHeight);
 
         mLayoutParams.type = WindowManager.LayoutParams.TYPE_SYSTEM_ALERT;
         mLayoutParams.format = PixelFormat.RGBA_8888;
