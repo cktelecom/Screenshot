@@ -199,7 +199,7 @@ public class ScreenshotEditorService extends Service implements View.OnClickList
                 COLOR_PANEL = 1 - COLOR_PANEL;
                 break;
             case R.id.undo:
-                mImgScreenshot.initializeEraser();
+                mImgScreenshot.undo();
                 break;
             case R.id.button_cut:
                 cutStart();

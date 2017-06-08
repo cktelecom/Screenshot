@@ -11,12 +11,17 @@ import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
 import android.support.annotation.ColorInt;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 
+import java.util.LinkedList;
+
 public class DrawingView extends View {
+    private static final String TAG = "DrawingView";
     private static final float TOUCH_TOLERANCE = 4;
     private Bitmap mBitmap;
+    private Bitmap mOriginBitmap;
     private Canvas mCanvas;
     private Path mPath;
     private Paint mBitmapPaint;
@@ -28,6 +33,9 @@ public class DrawingView extends View {
     private float mProportion = 0;
     private float mTranslationalW = 0;
     private float mTranslationalH = 0;
+    private int mPenColor;
+    private LinkedList<DrawPath> savePath;
+    private DrawPath dp;
 
     public DrawingView(Context c) {
         this(c, null);
@@ -43,18 +51,10 @@ public class DrawingView extends View {
     }
 
     private void init() {
-        mPath = new Path();
+        Log.d(TAG, "init: ");
         mBitmapPaint = new Paint(Paint.ANTI_ALIAS_FLAG | Paint.DITHER_FLAG);
-        mPaint = new Paint();
-        mPaint.setAntiAlias(true);
-        mPaint.setDither(true);
-        mPaint.setColor(Color.TRANSPARENT);
-        mPaint.setStyle(Paint.Style.STROKE);
-        mPaint.setStrokeJoin(Paint.Join.ROUND);
-        mPaint.setStrokeCap(Paint.Cap.ROUND);
-        mPaint.setStrokeWidth(mPenSize);
-        mDrawMode = true;
-        mPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.DST));
+        mDrawMode = false;
+        savePath = new LinkedList<>();
     }
 
     @Override
@@ -92,38 +92,11 @@ public class DrawingView extends View {
         }
     }
 
-    private void touch_start(float x, float y) {
-        mPath.reset();
-        mPath.moveTo(x, y);
-        mX = x;
-        mY = y;
-        mCanvas.drawPath(mPath, mPaint);
-    }
-
-    private void touch_move(float x, float y) {
-        float dx = Math.abs(x - mX);
-        float dy = Math.abs(y - mY);
-        if (dx >= TOUCH_TOLERANCE || dy >= TOUCH_TOLERANCE) {
-            mPath.quadTo(mX, mY, (x + mX) / 2, (y + mY) / 2);
-            mX = x;
-            mY = y;
-        }
-        mCanvas.drawPath(mPath, mPaint);
-    }
-
-    private void touch_up() {
-        mPath.lineTo(mX, mY);
-        mCanvas.drawPath(mPath, mPaint);
-        mPath.reset();
-        if (mDrawMode) {
-            mPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SCREEN));
-        } else {
-            mPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));
-        }
-    }
-
     @Override
     public boolean onTouchEvent(MotionEvent event) {
+        if (!mDrawMode) {
+            return false;
+        }
         float x;
         float y;
         if (mProportion != 0 && mTranslationalW != 0) {
@@ -138,42 +111,52 @@ public class DrawingView extends View {
         }
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
-                if (mDrawMode) {
-                    mPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_OVER));
-                } else {
-                    mPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));
-                }
-                touch_start(x, y);
-                invalidate();
+                mPath = new Path();
+                dp = new DrawPath();
+                dp.path = mPath;
+                dp.paint = mPaint;
+                mPath.reset();
+                mPath.moveTo(x, y);
+                mX = x;
+                mY = y;
+                mCanvas.drawPath(mPath, mPaint);
                 break;
             case MotionEvent.ACTION_MOVE:
-                touch_move(x, y);
-                if (!mDrawMode) {
-                    mPath.lineTo(mX, mY);
-                    mPath.reset();
-                    mPath.moveTo(x, y);
+                float dx = Math.abs(x - mX);
+                float dy = Math.abs(y - mY);
+                if (dx >= TOUCH_TOLERANCE || dy >= TOUCH_TOLERANCE) {
+                    mPath.quadTo(mX, mY, (x + mX) / 2, (y + mY) / 2);
+                    mX = x;
+                    mY = y;
                 }
                 mCanvas.drawPath(mPath, mPaint);
-                invalidate();
                 break;
             case MotionEvent.ACTION_UP:
-                touch_up();
-                invalidate();
+                mPath.lineTo(mX, mY);
+                mCanvas.drawPath(mPath, mPaint);
+                savePath.add(dp);
+                mPath = null;
+                break;
+            default:
                 break;
         }
+        invalidate();
         return true;
     }
 
     public void initializePen() {
         mDrawMode = true;
+        mPaint = null;
+        mPaint = new Paint();
         mPaint.setAntiAlias(true);
         mPaint.setDither(true);
+        mPaint.setFilterBitmap(true);
         mPaint.setStyle(Paint.Style.STROKE);
         mPaint.setStrokeJoin(Paint.Join.ROUND);
         mPaint.setStrokeCap(Paint.Cap.ROUND);
         mPaint.setStrokeWidth(mPenSize);
-        mPaint.setFilterBitmap(true);
-        mPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.DST_OVER));
+        mPaint.setColor(mPenColor);
+        mPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_OVER));
     }
 
     public void initializeEraser() {
@@ -209,7 +192,8 @@ public class DrawingView extends View {
     }
 
     public void setPenColor(@ColorInt int color) {
-        mPaint.setColor(color);
+        mPenColor = color;
+        initializePen();
     }
 
     public
@@ -219,14 +203,39 @@ public class DrawingView extends View {
     }
 
     public void setImageBitmap(Bitmap bitmap) {
+        Log.d(TAG, "setImageBitmap: ");
+        mOriginBitmap = bitmap;
         mBitmap = bitmap.copy(Bitmap.Config.ARGB_8888, true);
         mCanvas = new Canvas(mBitmap);
         mCanvas.drawColor(Color.TRANSPARENT);
-        bitmap.recycle();
+//        bitmap.recycle();
         invalidate();
     }
 
     public Bitmap getImageBitmap() {
         return mBitmap;
+    }
+
+    // 路径对象
+    private class DrawPath {
+        Path path;
+        Paint paint;
+    }
+
+    public void undo() {
+        Log.d(TAG, "undo: recall last path");
+        if (savePath != null && savePath.size() > 0) {
+            // 清空画布
+            mCanvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR);
+            setImageBitmap(mOriginBitmap);
+
+            savePath.removeLast();
+
+            // 将路径保存列表中的路径重绘在画布上 遍历绘制
+            for (DrawPath dp : savePath) {
+                mCanvas.drawPath(dp.path, dp.paint);
+            }
+            invalidate();
+        }
     }
 }
