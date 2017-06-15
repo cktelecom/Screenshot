@@ -3,9 +3,10 @@
     <string name="tile_name">截屏</string>
     <string name="app_name">截屏</string>
     <string name="share">分享</string>
-    <string name="cancel">取消</string>
     <string name="save">保存</string>
     <string name="paint">涂鸦</string>
     <string name="long_screenshot">长截图</string>
     <string name="crop_cut">裁剪</string>
+    <string name="cancel">取消</string>
+    <string name="instruction">这个应用仅可运行在Android 7.0以上的版本上。\n\n\要使用这个app先要把截图图块添加到快速设置面板。\n应用正常运行需要赋予“手机存储”权限，和设置允许“出现在其他应用上”。</string>
 </resources>

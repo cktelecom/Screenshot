@@ -5,12 +5,9 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.ColorFilter;
 import android.graphics.Paint;
+import android.graphics.PixelFormat;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
-
-/**
- * Created by admin on 2017/05/26   .
- */
 
 public class FloatDrawable extends Drawable {
 
@@ -117,7 +114,7 @@ public class FloatDrawable extends Drawable {
 
     @Override
     public int getOpacity() {
-        return 0;
+        return PixelFormat.UNKNOWN;
     }
 
     public int dipTopx(Context context, float dpValue) {

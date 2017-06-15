@@ -18,6 +18,7 @@ public class FileUtil {
             + "Screenshots" + File.separator;
     private static final String SCREENSHOT_FILE_NAME_TEMPLATE = "Screenshot_%s.png";
     private static String mScreenshotDirAndName;
+    private static Bitmap mBitmap;
 
     private static String getAppPath(Context context) {
         if (Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState())) {
@@ -77,5 +78,14 @@ public class FileUtil {
             Log.e(TAG, "saveScreenshotFile: failed");
             e.printStackTrace();
         }
+    }
+
+    // save screenshot bitmap temporarily
+    public static void setBitmap(Bitmap bitmap) {
+        mBitmap = bitmap;
+    }
+
+    public static Bitmap getBitmap() {
+        return mBitmap;
     }
 }

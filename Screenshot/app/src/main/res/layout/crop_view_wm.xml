@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:layout_width="match_parent"
-              android:layout_height="match_parent"
-              android:orientation="vertical">
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
 
     <LinearLayout
         android:id="@+id/top_bar"
@@ -127,8 +127,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:src="@drawable/ic_pen"
-            android:text="@string/brush_size"/>
+            android:src="@drawable/ic_pen"/>
 
         <ImageButton
             android:id="@+id/color_panel"
@@ -136,8 +135,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:src="@drawable/ic_color_red"
-            android:text="@string/color"/>
+            android:src="@drawable/ic_color_red"/>
 
 
         <ImageButton
@@ -146,8 +144,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:src="@drawable/ic_undo"
-            android:text="@string/undo"/>
+            android:src="@drawable/ic_undo"/>
 
     </LinearLayout>
 

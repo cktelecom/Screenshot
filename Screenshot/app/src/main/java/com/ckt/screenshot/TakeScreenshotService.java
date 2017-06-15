@@ -55,7 +55,7 @@ public class TakeScreenshotService extends Service {
             public void run() {
                 startScreenShot();
             }
-        }, 500);
+        }, 700);
         return Service.START_STICKY;
     }
 
@@ -194,7 +194,7 @@ public class TakeScreenshotService extends Service {
             super.onPostExecute(bitmap);
 
             if (bitmap != null) {
-                ScreenshotActivity.setBitmap(bitmap);
+                FileUtil.setBitmap(bitmap);
                 Log.d(TAG, "获取图片成功");
                 Intent intent = new Intent(getApplicationContext(), ScreenshotEditorService.class);
                 startService(intent);

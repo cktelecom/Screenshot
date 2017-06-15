@@ -8,9 +8,6 @@
     <string name="long_screenshot">Long Screenshot</string>
     <string name="action_delete_success">Delete success</string>
     <string name="action_delete_failed">Delete failed</string>
-    <string name="pen">Pen</string>
-    <string name="color">Brush Color</string>
-    <string name="brush_size">Brush size</string>
-    <string name="undo">Undo</string>
     <string name="crop_cut">Cut</string>
+    <string name="instruction">This app only works on android 7.0+.\n\nFirst, add screenshot tile in Quick Settings panel like below.\nSecond, to save pictures this app gonna need permission to access storage.</string>
 </resources>

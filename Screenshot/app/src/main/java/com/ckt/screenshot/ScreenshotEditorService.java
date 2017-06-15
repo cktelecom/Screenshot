@@ -1,6 +1,5 @@
 package com.ckt.screenshot;
 
-import android.annotation.TargetApi;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
@@ -10,10 +9,8 @@ import android.graphics.PixelFormat;
 import android.graphics.Point;
 import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Handler;
 import android.os.IBinder;
-import android.provider.Settings;
 import android.util.Log;
 import android.view.Display;
 import android.view.KeyEvent;
@@ -40,11 +37,8 @@ public class ScreenshotEditorService extends Service implements View.OnClickList
     private WindowManager wm;
     private boolean isShowing = false;
     private DrawingView mImgScreenshot;
-    private Bitmap mBitmap;
     private Handler mainHandler;
     private static String mScreenshotPath;
-    private static final String SCREENSHOT_FILE_NAME_TEMPLATE = "Screenshot_%s.png";
-    private static final String SCREENSHOT_DIR = "/storage/emulated/0/ScreenCapture/Screenshots";
     private static int COLOR_PANEL = 0;
     private static int BRUSH = 0;
     private ImageButton mColorPanel;
@@ -98,7 +92,6 @@ public class ScreenshotEditorService extends Service implements View.OnClickList
     public void onDestroy() {
         super.onDestroy();
         mainHandler = null;
-        mBitmap = null;
         System.gc();
     }
 
@@ -221,11 +214,11 @@ public class ScreenshotEditorService extends Service implements View.OnClickList
     }
 
     private void cutStart() {
-        Bitmap mbitmap = mImgScreenshot.getImageBitmap();
+        Bitmap mBitmap = mImgScreenshot.getImageBitmap();
         mImgScreenshot.setVisibility(View.GONE);
         mLinearLayout.setVisibility(View.GONE);
         mLinearLayoutsure.setVisibility(View.VISIBLE);
-        mCropImageView.setDrawable(new BitmapDrawable(mbitmap), 300, 300);
+        mCropImageView.setDrawable(new BitmapDrawable(mBitmap), 300, 300);
         mCropImageView.setVisibility(View.VISIBLE);
     }
 
@@ -269,7 +262,7 @@ public class ScreenshotEditorService extends Service implements View.OnClickList
     public void loadScreenshot() {
 
         Log.d(TAG, "loadScreenshot: exists");
-        Bitmap bitmap = ScreenshotActivity.getBitmap();
+        Bitmap bitmap = FileUtil.getBitmap();
         mImgScreenshot.setImageBitmap(bitmap);
     }
 
@@ -297,7 +290,6 @@ public class ScreenshotEditorService extends Service implements View.OnClickList
 
     public void shareScreenshot() {
         Log.d(TAG, "shareScreenshot pics");
-        mScreenshotPath = FileUtil.getScreenshotDirAndName();
         final File imageFile = new File(mScreenshotPath);
         // Create a shareScreenshot intent
         Intent sharingIntent = new Intent(Intent.ACTION_SEND);
@@ -329,11 +321,6 @@ public class ScreenshotEditorService extends Service implements View.OnClickList
                     wm.updateViewLayout(mainLayout, getParams());
             }
         });
-    }
-
-    @TargetApi(Build.VERSION_CODES.M)
-    public static boolean canWeDrawOurOverlay(Context mContext) {
-        return Settings.canDrawOverlays(mContext);
     }
 
     private WindowManager.LayoutParams getParams() {
