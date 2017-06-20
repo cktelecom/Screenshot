@@ -225,6 +225,7 @@ public class ScreenshotEditorService extends Service implements View.OnClickList
     private void changeToPaintMode() {
         mainLayout.findViewById(R.id.bot_bar).setVisibility(View.GONE);
         mainLayout.findViewById(R.id.paint_bar).setVisibility(View.VISIBLE);
+        mImgScreenshot.initializePen();
         mImgScreenshot.setPenSize(10);
         mImgScreenshot.setPenColor(getColor(R.color.red));
     }

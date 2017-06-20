@@ -28,14 +28,11 @@ public class DrawingView extends View {
     private Paint mPaint;
     private boolean mDrawMode;
     private float mX, mY;
-    private float mPenSize = 0;
     private float mEraserSize = 10;
     private float mProportion = 0;
     private float mTranslationalW = 0;
     private float mTranslationalH = 0;
-    private int mPenColor;
     private LinkedList<DrawPath> savePath;
-    private DrawPath dp;
 
     public DrawingView(Context c) {
         this(c, null);
@@ -112,9 +109,6 @@ public class DrawingView extends View {
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
                 mPath = new Path();
-                dp = new DrawPath();
-                dp.path = mPath;
-                dp.paint = mPaint;
                 mPath.reset();
                 mPath.moveTo(x, y);
                 mX = x;
@@ -134,7 +128,7 @@ public class DrawingView extends View {
             case MotionEvent.ACTION_UP:
                 mPath.lineTo(mX, mY);
                 mCanvas.drawPath(mPath, mPaint);
-                savePath.add(dp);
+                savePath.add(new DrawPath(mPath, mPaint.getColor(), mPaint.getStrokeWidth()));
                 mPath = null;
                 break;
             default:
@@ -154,8 +148,6 @@ public class DrawingView extends View {
         mPaint.setStyle(Paint.Style.STROKE);
         mPaint.setStrokeJoin(Paint.Join.ROUND);
         mPaint.setStrokeCap(Paint.Cap.ROUND);
-        mPaint.setStrokeWidth(mPenSize);
-        mPaint.setColor(mPenColor);
         mPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_OVER));
     }
 
@@ -183,17 +175,15 @@ public class DrawingView extends View {
     }
 
     public void setPenSize(float size) {
-        mPenSize = size;
-        initializePen();
+        mPaint.setStrokeWidth(size);
     }
 
     public float getPenSize() {
-        return mPenSize;
+        return mPaint.getStrokeWidth();
     }
 
     public void setPenColor(@ColorInt int color) {
-        mPenColor = color;
-        initializePen();
+        mPaint.setColor(color);
     }
 
     public
@@ -216,12 +206,6 @@ public class DrawingView extends View {
         return mBitmap;
     }
 
-    // 路径对象
-    private class DrawPath {
-        Path path;
-        Paint paint;
-    }
-
     public void undo() {
         Log.d(TAG, "undo: recall last path");
         if (savePath != null && savePath.size() > 0) {
@@ -233,9 +217,33 @@ public class DrawingView extends View {
 
             // 将路径保存列表中的路径重绘在画布上 遍历绘制
             for (DrawPath dp : savePath) {
-                mCanvas.drawPath(dp.path, dp.paint);
+                mPaint.setColor(dp.getPaintColor());
+                mPaint.setStrokeWidth(dp.getPaintWidth());
+                mCanvas.drawPath(dp.path, mPaint);
             }
             invalidate();
+        }
+    }
+
+    // 路径对象
+    private class DrawPath {
+        Path path;
+        int paintColor;
+        float paintWidth;
+
+        DrawPath(Path path, int paintColor, float paintWidth) {
+            this.path = path;
+            this.paintColor = paintColor;
+            this.paintWidth = paintWidth;
+
+        }
+
+        int getPaintColor() {
+            return paintColor;
+        }
+
+        float getPaintWidth() {
+            return paintWidth;
         }
     }
 }
