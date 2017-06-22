@@ -30,8 +30,6 @@ public class DrawingView extends View {
     private float mX, mY;
     private float mEraserSize = 10;
     private float mProportion = 0;
-    private float mTranslationalW = 0;
-    private float mTranslationalH = 0;
     private LinkedList<DrawPath> savePath;
 
     public DrawingView(Context c) {
@@ -57,6 +55,20 @@ public class DrawingView extends View {
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+
+        int widthSize = MeasureSpec.getSize(widthMeasureSpec);
+        int heightSize = MeasureSpec.getSize(heightMeasureSpec);
+
+        if (mBitmap != null) {
+            if (mBitmap.getHeight() > heightSize) {
+                widthSize = heightSize * mBitmap.getWidth() / mBitmap.getHeight();
+            } else {
+                heightSize = mBitmap.getHeight();
+                widthSize = mBitmap.getWidth();
+            }
+        }
+        Log.d(TAG, "onMeasure: heightSize: " + heightSize + " widthSize: " + widthSize);
+        setMeasuredDimension(widthSize, heightSize);
     }
 
     @Override
@@ -76,16 +88,12 @@ public class DrawingView extends View {
         float proportion = (float) canvas.getHeight() / mBitmap.getHeight();
         if (proportion < 1) {
             mProportion = proportion;
-            mTranslationalW = (canvas.getWidth() - mBitmap.getWidth() * proportion) / 2;
             matrix.postScale(proportion, proportion);
             matrix.postTranslate((canvas.getWidth() - mBitmap.getWidth() * proportion) / 2, 0);
             canvas.drawBitmap(mBitmap, matrix, mBitmapPaint);
         } else {
-            mTranslationalW = (canvas.getWidth() - mBitmap.getWidth()) / 2;
-            mTranslationalH = (canvas.getHeight() - mBitmap.getHeight()) / 2;
             mProportion = 0;
-            canvas.drawBitmap(mBitmap, (canvas.getWidth() - mBitmap.getWidth()) / 2,
-                    (canvas.getHeight() - mBitmap.getHeight()) / 2, mBitmapPaint);
+            canvas.drawBitmap(mBitmap, 0, 0, mBitmapPaint);
         }
     }
 
@@ -96,12 +104,9 @@ public class DrawingView extends View {
         }
         float x;
         float y;
-        if (mProportion != 0 && mTranslationalW != 0) {
-            x = (event.getX() - mTranslationalW) / mProportion;
+        if (mProportion != 0 ) {
+            x = (event.getX()) / mProportion;
             y = event.getY() / mProportion;
-        } else if (mTranslationalH != 0) {
-            x = event.getX() - mTranslationalW;
-            y = event.getY() - mTranslationalH;
         } else {
             x = event.getX();
             y = event.getY();
