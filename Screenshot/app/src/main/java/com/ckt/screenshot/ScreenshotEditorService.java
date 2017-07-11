@@ -7,7 +7,6 @@ import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.PixelFormat;
 import android.graphics.Point;
-import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Handler;
 import android.os.IBinder;
@@ -218,7 +217,7 @@ public class ScreenshotEditorService extends Service implements View.OnClickList
         mImgScreenshot.setVisibility(View.GONE);
         mLinearLayout.setVisibility(View.GONE);
         mLinearLayoutsure.setVisibility(View.VISIBLE);
-        mCropImageView.setDrawable(new BitmapDrawable(mBitmap), 300, 300);
+        mCropImageView.setDrawable(mBitmap, 200, 300);
         mCropImageView.setVisibility(View.VISIBLE);
     }
 
