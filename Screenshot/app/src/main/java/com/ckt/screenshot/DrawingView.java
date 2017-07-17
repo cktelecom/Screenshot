@@ -31,6 +31,8 @@ public class DrawingView extends View {
     private float mEraserSize = 10;
     private float mProportion = 0;
     private LinkedList<DrawPath> savePath;
+    private DrawPath mLastDrawPath;
+    private Matrix matrix;
 
     public DrawingView(Context c) {
         this(c, null);
@@ -50,6 +52,7 @@ public class DrawingView extends View {
         mBitmapPaint = new Paint(Paint.ANTI_ALIAS_FLAG | Paint.DITHER_FLAG);
         mDrawMode = false;
         savePath = new LinkedList<>();
+        matrix = new Matrix();
     }
 
     @Override
@@ -60,8 +63,10 @@ public class DrawingView extends View {
         int heightSize = MeasureSpec.getSize(heightMeasureSpec);
 
         if (mBitmap != null) {
-            if (mBitmap.getHeight() > heightSize) {
+            if ((mBitmap.getHeight() > heightSize) && (mBitmap.getHeight() > mBitmap.getWidth())) {
                 widthSize = heightSize * mBitmap.getWidth() / mBitmap.getHeight();
+            } else if ((mBitmap.getWidth() > widthSize) && (mBitmap.getWidth() > mBitmap.getHeight())) {
+                heightSize = widthSize * mBitmap.getHeight() / mBitmap.getWidth();
             } else {
                 heightSize = mBitmap.getHeight();
                 widthSize = mBitmap.getWidth();
@@ -84,10 +89,10 @@ public class DrawingView extends View {
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
-        Matrix matrix = new Matrix();
         float proportion = (float) canvas.getHeight() / mBitmap.getHeight();
         if (proportion < 1) {
             mProportion = proportion;
+            matrix.reset();
             matrix.postScale(proportion, proportion);
             matrix.postTranslate((canvas.getWidth() - mBitmap.getWidth() * proportion) / 2, 0);
             canvas.drawBitmap(mBitmap, matrix, mBitmapPaint);
@@ -113,6 +118,10 @@ public class DrawingView extends View {
         }
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
+                if (savePath.size() == 0 && mLastDrawPath != null) {
+                    mPaint.setColor(mLastDrawPath.getPaintColor());
+                    mPaint.setStrokeWidth(mLastDrawPath.getPaintWidth());
+                }
                 mPath = new Path();
                 mPath.reset();
                 mPath.moveTo(x, y);
@@ -133,7 +142,8 @@ public class DrawingView extends View {
             case MotionEvent.ACTION_UP:
                 mPath.lineTo(mX, mY);
                 mCanvas.drawPath(mPath, mPaint);
-                savePath.add(new DrawPath(mPath, mPaint.getColor(), mPaint.getStrokeWidth()));
+                mLastDrawPath = new DrawPath(mPath, mPaint.getColor(), mPaint.getStrokeWidth());
+                savePath.add(mLastDrawPath);
                 mPath = null;
                 break;
             default:
