@@ -1,5 +1,5 @@
 # Screenshot
-A screenshot app run on Android N+(CKT Chengdu internal Project).  
+A screenshot app run on Android N+(CKT Chengdu Internal Project).
 
 ## Usage
 This app only works on android 7.0+.
