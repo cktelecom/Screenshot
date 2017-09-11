@@ -47,6 +47,7 @@ public class ScreenshotEditorService extends Service implements View.OnClickList
     private LinearLayout mLinearLayout;
     private LinearLayout mLinearLayoutsure;
     private Button mButtonCut;
+    private boolean mCutMode;
 
     @Override
     public void onCreate() {
@@ -164,6 +165,9 @@ public class ScreenshotEditorService extends Service implements View.OnClickList
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.btn_share:
+                if (mCutMode) {
+                    cutEnd();
+                }
                 saveScreenshot();
                 shareScreenshot();
                 removeView();
@@ -173,6 +177,9 @@ public class ScreenshotEditorService extends Service implements View.OnClickList
                 removeView();
                 break;
             case R.id.btn_save:
+                if (mCutMode) {
+                    cutEnd();
+                }
                 saveScreenshot();
                 removeView();
                 onDestroy();
@@ -205,6 +212,7 @@ public class ScreenshotEditorService extends Service implements View.OnClickList
     }
 
     private void cutEnd() {
+        mCutMode = false;
         mImgScreenshot.setImageBitmap(mCropImageView.getCropImage());
         mImgScreenshot.setVisibility(View.VISIBLE);
         mLinearLayout.setVisibility(View.VISIBLE);
@@ -213,6 +221,7 @@ public class ScreenshotEditorService extends Service implements View.OnClickList
     }
 
     private void cutStart() {
+        mCutMode = true;
         Bitmap mBitmap = mImgScreenshot.getImageBitmap();
         mImgScreenshot.setVisibility(View.GONE);
         mLinearLayout.setVisibility(View.GONE);
